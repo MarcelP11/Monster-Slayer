@@ -8,7 +8,8 @@ const app = Vue.createApp({
             playerHealth: 100,
             monsterHealth: 100,
             currentRound: 0,
-            winner: null  //default falsey value used for v-if
+            winner: null,  //default falsey value used for v-if
+            logMessages: []
         };
     },
     computed: {
@@ -50,21 +51,25 @@ const app = Vue.createApp({
             this.monsterHealth = 100;
             this.currentRound = 0;
             this.winner = null;
+            this.logMessages = [];
         },
         attackMonster(){
             this.currentRound++;
             const attackValue = getRandomValue(5, 12);
             this.monsterHealth -= attackValue;
+            this.addLogMessage("player", "attack", attackValue);
             this.attackPlayer();  //once the player attacks monster then the monster also attacks player at the same time
         },
         attackPlayer(){
             const attackValue = getRandomValue(8, 15);  //monster have more power of attack in compare with player
             this.playerHealth -= attackValue;
+            this.addLogMessage("monster", "attack", attackValue);
         },
         specialAttackMonster(){
             this.currentRound++;
             const attackValue = getRandomValue(10, 25);  //more powerfull attack
             this.monsterHealth -= attackValue;
+            this.addLogMessage("player", "special-attack", attackValue);
             this.attackPlayer();
         },
         healPlayer(){
@@ -75,7 +80,18 @@ const app = Vue.createApp({
             } else {
                 this.playerHealth += healValue;
             }
+            this.addLogMessage("player", "heal", healValue);
             this.attackPlayer();
+        },
+        surrender(){
+            this.winner = "monster";  //when player surrender, the monster is winner
+        },
+        addLogMessage(who, what, value){
+            this.logMessages.unshift({  //we want to put latest action at the top of list on page
+                actionBy: who,
+                actionType: what,
+                actionValue: value
+            });
         }
     }
 });
